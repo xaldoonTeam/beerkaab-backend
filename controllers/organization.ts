@@ -7,11 +7,13 @@ export const createOrganization = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { name, username, password, email, description, phone } = req.body;
+    const { name, username, password, email, description, phone, address } =
+      req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
     const organization: any = await prisma.organizations.create({
       data: {
         name,
+        address,
         username,
         password: hashedPassword,
         email,

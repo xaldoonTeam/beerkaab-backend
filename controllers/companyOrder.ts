@@ -39,13 +39,23 @@ export const createOrder = async (
         message: 'Please Fill Out',
       });
     }
-    const { farmer_name, phone, address, tool_id, organization_id, status } =
-      req.body;
+    const {
+      farmer_name,
+      phone,
+      address,
+      tool_id,
+      start_date,
+      end_date,
+      organization_id,
+      status,
+    } = req.body;
     const order: any = await prisma.orders.create({
       data: {
         farmer_name,
         phone,
         address,
+        start_date,
+        end_date,
         tool_id,
         organization_id,
         status,

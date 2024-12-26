@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import prisma from '../config/dbConn.ts';
+
 export const createTool = async (
   req: Request,
   res: Response
@@ -11,14 +12,23 @@ export const createTool = async (
       });
     }
 
-    const { name, description, price, location, organization_id, image } =
-      req.body;
+    const {
+      name,
+      description,
+      price,
+      location,
+      category,
+      organization_id,
+      image,
+    } = req.body;
 
     const tool: any = await prisma.tools.create({
       data: {
         name,
         description,
         price,
+        location,
+        category,
         organization_id,
         image,
       },

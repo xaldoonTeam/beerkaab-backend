@@ -13,27 +13,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Orders {
-  id              Int           @id @default(autoincrement())
-  farmer_name     String
-  address         String
-  phone           String
-  status          String
-  duration        Int?
-  organization_id Int
-  organization    Organizations @relation(fields: [organization_id], references: [id])
-  tool_id         Int
-  tool            Tools         @relation(fields: [tool_id], references: [id])
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+enum ToolStatus {
+  AVAILABLE
+  UNAVAILABLE
+}
+
+// user needed
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Organizations {
-  id          Int      @id @default(autoincrement())
-  name        String
-  username    String
-  password    String
-  email       String   @unique
+  id       Int    @id @default(autoincrement())
+  name     String
+  username String
+  password String
+  email    String @unique
+  address  String
+  // type needed
+
   phone       String
   description String
   tools       Tools[]
@@ -42,15 +45,38 @@ model Organizations {
   updatedAt   DateTime @updatedAt
 }
 
+// model Service {
+//   id Int @id 
+// }
+
 model Tools {
   id              Int           @id @default(autoincrement())
   name            String
   description     String
   price           String
   image           String
+  status          ToolStatus    @default(AVAILABLE)
+  location        String
+  category        String
   organization_id Int
-  organization    Organizations @relation(fields: [organization_id], references: [id])
+  organization    Organizations @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   orders          Orders[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model Orders {
+  id              Int           @id @default(autoincrement())
+  farmer_name     String
+  address         String
+  phone           String
+  status          String
+  start_date      DateTime?
+  end_date        DateTime?
+  organization_id Int
+  organization    Organizations @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  tool_id         Int
+  tool            Tools         @relation(fields: [tool_id], references: [id])
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 }
