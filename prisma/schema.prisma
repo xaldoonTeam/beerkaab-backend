@@ -13,27 +13,44 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  Admin
-  SuperAdmin
-}
-
-model CoreUser {
-  id       Int      @id @default(autoincrement())
-  name     String
-  password String
-  createAt DateTime
-  updateAt DateTime @updatedAt
-}
-
-model Booking {
-  id Int @id @default(autoincrement())
+model Orders {
+  id              Int           @id @default(autoincrement())
+  farmer_name     String
+  address         String
+  phone           String
+  status          String
+  duration        Int?
+  organization_id Int
+  organization    Organizations @relation(fields: [organization_id], references: [id])
+  tool_id         Int
+  tool            Tools         @relation(fields: [tool_id], references: [id])
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 }
 
 model Organizations {
-  id Int @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
+  name        String
+  username    String
+  password    String
+  email       String   @unique
+  phone       String
+  description String
+  tools       Tools[]
+  orders      Orders[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
-model Farmers {
-  id Int @id @default(autoincrement())
+model Tools {
+  id              Int           @id @default(autoincrement())
+  name            String
+  description     String
+  price           String
+  image           String
+  organization_id Int
+  organization    Organizations @relation(fields: [organization_id], references: [id])
+  orders          Orders[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 }
