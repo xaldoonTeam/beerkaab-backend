@@ -29,18 +29,23 @@ enum recycle {
    Nothidde
 }
 
-//google looging  
-model Users {
-  id    String @id @default(cuid())
-  name  String?
-  email String @unique
-  image String?
-}
+// //google looging  
+// model Users {
+//   id    String @id @default(cuid())
+//   name  String?
+//   email String @unique
+//   image String?
+// }
 // user needed
+enum  type {
+  User
+  Organization
+}
 model User {
   id        Int      @id @default(autoincrement())
   username  String
   email     String   @unique
+  type         type @default(User)
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -57,6 +62,7 @@ model Organizations {
   status      ComStatus @default(unpaid)
   phone       String
   description String
+  type         type @default(Organization)
   tools       Tools[]
   orders      Orders[]
   createdAt   DateTime  @default(now())
