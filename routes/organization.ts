@@ -6,7 +6,7 @@ import {
 
 const router = express.Router();
 
-router.post('/create', createOrganization);
+router.post('/Dashboard/Company/create', createOrganization);
 router.get('/login', loginOrganization);
 
 export default router;
