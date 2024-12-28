@@ -52,3 +52,16 @@ export const decodeToken = (req: CustomUserRequest, res: Response, next: NextFun
         });
     }
 }
+
+
+
+
+ // Ensure this matches your project structure
+
+// export const isSuperAdmin = (req: CustomUserRequest, res: Response, next: NextFunction): void => {
+//     if (!req.user || !req.user.isAdmin) {
+//         res.status(403).json({ message: 'Forbidden: You do not have sufficient permissions.' });
+//         return;
+//     }
+//     next();
+// };

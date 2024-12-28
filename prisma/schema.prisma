@@ -41,11 +41,17 @@ enum  type {
   User
   Organization
 }
+enum Role {
+  user
+  admin 
+  superAdmin
+}
 model User {
   id        Int      @id @default(autoincrement())
   username  String
   email     String   @unique
   type         type @default(User)
+  role Role @default(user)
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -58,6 +64,7 @@ model Organizations {
   password    String
   email       String    @unique
   address     String
+  role Role @default(admin)
   Isdeleted   recycle   @default(Nothidde)
   status      ComStatus @default(unpaid)
   phone       String
