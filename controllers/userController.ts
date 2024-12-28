@@ -2,6 +2,7 @@ import prisma from '../config/dbConn.ts';
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 
+// User Creation
 export const createUser = async (
   req: Request,
   res: Response
@@ -32,40 +33,7 @@ export const createUser = async (
   }
 };
 
-// export const loginUser = async (req: Request, res: Response): Promise<void> => {
-//   try {
-//     const { email, password } = req.body;
-//     const existingUser: any = await prisma.user.findUnique({
-//       where: {
-//         email: email,
-//       },
-//     });
-//     if (!existingUser) {
-//       res.status(404).json({
-//         message: 'User not found',
-//       });
-//       return;
-//     }
-
-//     const match = await bcrypt.compare(password, existingUser.password);
-//     if (!match) {
-//       res.status(401).json({
-//         message: 'Invalid credentials',
-//       });
-//       return;
-//     }
-
-//     res.status(200).json({
-//       message: 'User logged in successfully',
-//       existingUser,
-//     });
-
-//     return existingUser;
-//   } catch (err) {
-//     console.log(`Error while logging in a user: ${err}`);
-//   }
-// };
-
+// Login
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password } = req.body;
@@ -125,6 +93,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+// Update User
 export const updateUser = async (
   req: Request,
   res: Response
@@ -149,6 +118,7 @@ export const updateUser = async (
   }
 };
 
+// Delete User
 export const deleteUser = async (
   req: Request,
   res: Response

@@ -1,6 +1,7 @@
 import prisma from '../config/dbConn.ts';
 import { Request, Response } from 'express';
 
+// Orders
 export const getAllOrders = async (
   req: Request,
   res: Response
@@ -29,6 +30,7 @@ export const getAllOrders = async (
   }
 };
 
+// Create Order
 export const createOrder = async (
   req: Request,
   res: Response
@@ -71,6 +73,7 @@ export const createOrder = async (
   }
 };
 
+// Update Order
 export const updateOrder = async (
   req: Request,
   res: Response
@@ -94,6 +97,7 @@ export const updateOrder = async (
   }
 };
 
+// Delete Order
 export const deleteOrder = async (
   req: Request,
   res: Response
@@ -116,6 +120,7 @@ export const deleteOrder = async (
   }
 };
 
+// Get One Order
 export const getOrder = async (req: Request, res: Response): Promise<void> => {
   try {
     const id = parseInt(req.params.id);
