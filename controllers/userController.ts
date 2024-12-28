@@ -81,6 +81,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     const user = await prisma.user.findUnique({
       where: { email },
     });
+    
 
     if (user) {
       // Validate password for user
@@ -125,6 +126,85 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     res.status(404).json({ message: 'Account not found' });
   } catch (err) {
     console.error(`Error while logging in: ${err}`);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+
+
+export const getAllUsers = async (_req: Request, res: Response): Promise<void> => {
+  try {
+    const users = await prisma.user.findMany();
+    res.status(200).json(users);
+  } catch (err) {
+    console.error(`Error while fetching users: ${err}`);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+// Get a single user by ID
+export const getUserById = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const user = await prisma.user.findUnique({
+      where: { id: Number(id) },
+    });
+
+    if (!user) {
+      res.status(404).json({ message: 'User not found' });
+      return;
+    }
+
+    res.status(200).json(user);
+  } catch (err) {
+    console.error(`Error while fetching user: ${err}`);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+// Update a user
+export const updateUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { username, email, password } = req.body;
+
+    const data: any = {};
+    if (username) data.username = username;
+    if (email) data.email = email;
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      data.password = await bcrypt.hash(password, salt);
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: Number(id) },
+      data,
+    });
+
+    res.status(200).json({
+      message: 'User updated successfully',
+      updatedUser,
+    });
+  } catch (err) {
+    console.error(`Error while updating user: ${err}`);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+// Delete a user
+export const deleteUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const deletedUser = await prisma.user.delete({
+      where: { id: Number(id) },
+    });
+
+    res.status(200).json({
+      message: 'User deleted successfully',
+      deletedUser,
+    });
+  } catch (err) {
+    console.error(`Error while deleting user: ${err}`);
     res.status(500).json({ message: 'Internal server error' });
   }
 };
