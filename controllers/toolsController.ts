@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import prisma from '../config/dbConn.ts';
 
+// Tool Creation
 export const createTool = async (
   req: Request,
   res: Response
@@ -43,16 +44,43 @@ export const createTool = async (
   }
 };
 
+// Get All Tools
 export const getAllTools = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
+    const currentDate = new Date();
+
+    // Get Expired Order
+    await prisma.orders
+      .findMany({
+        where: {
+          end_date: {
+            lt: currentDate,
+          },
+        },
+        include: {
+          tool: true,
+        },
+      })
+      .then(async (expiredOrders) => {
+        for (const order of expiredOrders) {
+          await prisma.tools.update({
+            where: {
+              id: order.tool_id,
+            },
+            data: { status: 'AVAILABLE' },
+          });
+        }
+      });
+
     const tools: any = await prisma.tools.findMany({
       include: {
         organization: true,
       },
     });
+
     if (tools.length == 0) {
       res.status(404).json({
         message: 'No tools found',
@@ -64,12 +92,14 @@ export const getAllTools = async (
       message: 'Tools found',
       tools,
     });
+
     return tools;
   } catch (err) {
     console.log(`Error while getting all tools: ${err}`);
   }
 };
 
+// Update Tool
 export const updateTool = async (
   req: Request,
   res: Response
@@ -91,6 +121,7 @@ export const updateTool = async (
   }
 };
 
+// Delete Tool
 export const deleteTool = async (
   req: Request,
   res: Response
@@ -109,5 +140,32 @@ export const deleteTool = async (
     return deletedTool;
   } catch (err) {
     console.log(`Error while deleting a tool: ${err}`);
+  }
+};
+
+// Get One Tool
+export const getOneTool = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const tool: any = await prisma.tools.findUnique({
+      where: {
+        id: parseInt(req.params.id),
+      },
+    });
+    if (!tool) {
+      res.status(404).json({ message: 'Tool not found' });
+      return;
+    }
+
+    res.status(200).json({
+      message: 'Tool found',
+      tool,
+    });
+    return tool;
+  } catch (err) {
+    res.status(500).json({ message: 'Internal server error' });
+    console.log(`Error while getting a tool: ${err}`);
   }
 };

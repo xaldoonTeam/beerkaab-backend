@@ -2,7 +2,7 @@ import prisma from '../config/dbConn.ts';
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 
-
+// Organization Creation
 export const createOrganization = async (
   req: Request,
   res: Response
@@ -34,6 +34,7 @@ export const createOrganization = async (
   }
 };
 
+// Login Organization
 export const loginOrganization = async (
   req: Request,
   res: Response
@@ -71,16 +72,14 @@ export const loginOrganization = async (
   }
 };
 
-
-
-
+// Recycle Organization
 export const recycleOrganization = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    
+
     // Check if organization exists
     const organization = await prisma.organizations.findUnique({
       where: { id: Number(id) },
@@ -90,7 +89,7 @@ export const recycleOrganization = async (
       res.status(404).json({ message: 'Organization not found' });
       return;
     }
-    
+
     // Proceed to update if it exists
     const updatedOrganization = await prisma.organizations.update({
       where: { id: Number(id) },
@@ -107,20 +106,23 @@ export const recycleOrganization = async (
   }
 };
 
+// Restore Organization
 export const restoreOrganization = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    
+
     // Check if organization exists and is marked as deleted
     const organization = await prisma.organizations.findUnique({
       where: { id: Number(id), Isdeleted: 'hidden' },
     });
 
     if (!organization) {
-      res.status(404).json({ message: 'Organization not found or not deleted' });
+      res
+        .status(404)
+        .json({ message: 'Organization not found or not deleted' });
       return;
     }
 
@@ -140,6 +142,7 @@ export const restoreOrganization = async (
   }
 };
 
+// Delete Organization
 export const deleteOrganization = async (
   req: Request,
   res: Response
@@ -169,10 +172,8 @@ export const deleteOrganization = async (
   }
 };
 
-export const makePaid = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+// Make Paid
+export const makePaid = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
 
@@ -202,6 +203,7 @@ export const makePaid = async (
   }
 };
 
+// Make Unpaid
 export const makeUnpaid = async (
   req: Request,
   res: Response

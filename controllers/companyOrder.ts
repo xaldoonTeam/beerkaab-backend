@@ -1,6 +1,7 @@
 import prisma from '../config/dbConn.ts';
 import { Request, Response } from 'express';
 
+// Orders
 export const getAllOrders = async (
   req: Request,
   res: Response
@@ -29,6 +30,7 @@ export const getAllOrders = async (
   }
 };
 
+// Create Order
 export const createOrder = async (
   req: Request,
   res: Response
@@ -71,6 +73,7 @@ export const createOrder = async (
   }
 };
 
+// Update Order
 export const updateOrder = async (
   req: Request,
   res: Response
@@ -94,6 +97,7 @@ export const updateOrder = async (
   }
 };
 
+// Delete Order
 export const deleteOrder = async (
   req: Request,
   res: Response
@@ -113,5 +117,31 @@ export const deleteOrder = async (
     return deletedOrder;
   } catch (err) {
     console.log(`Error while deleting an order: ${err}`);
+  }
+};
+
+// Get One Order
+export const getOrder = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const id = parseInt(req.params.id);
+    const order: any = await prisma.orders.findUnique({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!order) {
+      res.status(404).json({ message: 'Order not found' });
+      return;
+    }
+
+    res.status(200).json({
+      message: 'Order found',
+      order,
+    });
+    return order;
+  } catch (err) {
+    res.status(500).json({ message: 'Internal server error' });
+    console.log(`Error while getting an order: ${err}`);
   }
 };

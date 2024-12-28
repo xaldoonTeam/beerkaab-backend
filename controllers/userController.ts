@@ -4,17 +4,17 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'
 
 
+// User Creation
 export const createUser = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
     const { username, password, email } = req.body;
-     if ( !username|| !password || !email){
-      
-       res.json("please enter valid data")
-      return 
-     }
+    if (!username || !password || !email) {
+      res.json('please enter valid data');
+      return;
+    }
     const salt = await bcrypt.genSalt(10);
     const hashPwd = await bcrypt.hash(password, salt);
     const newUser: any = await prisma.user.create({
@@ -82,6 +82,8 @@ interface CustomUserRequest extends Request {
 
 
 export const login = async (req: CustomUserRequest, res: Response, next: NextFunction): Promise<void> => {
+
+
   try {
     const { email, password } = req.body;
 
@@ -115,7 +117,9 @@ export const login = async (req: CustomUserRequest, res: Response, next: NextFun
     const organization = await prisma.organizations.findUnique({ where: { email } });
 
     if (organization) {
+
       const isPasswordValid = await bcrypt.compare(password, organization.password);
+
       if (!isPasswordValid) {
         res.status(401).json({ message: "Invalid credentials" });
         return;
@@ -156,6 +160,7 @@ export const getAllUsers = async (_req: Request, res: Response): Promise<void> =
   }
 };
 
+
 // Get a single user by ID
 export const getUserById = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -193,12 +198,14 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
     const updatedUser = await prisma.user.update({
       where: { id: Number(id) },
       data,
+
     });
 
     res.status(200).json({
       message: 'User updated successfully',
       updatedUser,
     });
+
   } catch (err) {
     console.error(`Error while updating user: ${err}`);
     res.status(500).json({ message: 'Internal server error' });
@@ -222,3 +229,4 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
