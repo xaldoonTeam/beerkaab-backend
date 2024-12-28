@@ -115,3 +115,28 @@ export const deleteOrder = async (
     console.log(`Error while deleting an order: ${err}`);
   }
 };
+
+export const getOrder = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const id = parseInt(req.params.id);
+    const order: any = await prisma.orders.findUnique({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!order) {
+      res.status(404).json({ message: 'Order not found' });
+      return;
+    }
+
+    res.status(200).json({
+      message: 'Order found',
+      order,
+    });
+    return order;
+  } catch (err) {
+    res.status(500).json({ message: 'Internal server error' });
+    console.log(`Error while getting an order: ${err}`);
+  }
+};

@@ -8,11 +8,10 @@ export const createUser = async (
 ): Promise<void> => {
   try {
     const { username, password, email } = req.body;
-     if ( !username|| !password || !email){
-      
-       res.json("please enter valid data")
-      return 
-     }
+    if (!username || !password || !email) {
+      res.json('please enter valid data');
+      return;
+    }
     const salt = await bcrypt.genSalt(10);
     const hashPwd = await bcrypt.hash(password, salt);
     const newUser: any = await prisma.user.create({
@@ -67,12 +66,6 @@ export const createUser = async (
 //   }
 // };
 
-
-
-
-
-
-
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password } = req.body;
@@ -106,7 +99,10 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
     if (organization) {
       // Validate password for organization
-      const isPasswordValid = await bcrypt.compare(password, organization.password);
+      const isPasswordValid = await bcrypt.compare(
+        password,
+        organization.password
+      );
       if (!isPasswordValid) {
         res.status(401).json({ message: 'Invalid credentials' });
         return;
@@ -126,5 +122,52 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   } catch (err) {
     console.error(`Error while logging in: ${err}`);
     res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+export const updateUser = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const id = parseInt(req.params.id);
+    const updatedUser: any = await prisma.user.update({
+      where: {
+        id: id,
+      },
+      data: req.body,
+    });
+
+    res.status(200).json({
+      message: 'User updated successfully',
+      updatedUser,
+    });
+    return updatedUser;
+  } catch (err) {
+    res.status(500).json({ message: 'Internal server error' });
+    console.log(`Error while updating a user: ${err}`);
+  }
+};
+
+export const deleteUser = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const id = parseInt(req.params.id);
+    const deletedUser: any = await prisma.user.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    res.status(201).json({
+      message: 'User deleted successfully',
+      deletedUser,
+    });
+    return deletedUser;
+  } catch (err) {
+    res.status(500).json({ message: 'Internal server error' });
+    console.log(`Error while updating a user: ${err}`);
   }
 };
