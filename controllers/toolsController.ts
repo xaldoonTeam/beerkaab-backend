@@ -169,5 +169,3 @@ export const getOneTool = async (
     console.log(`Error while getting a tool: ${err}`);
   }
 };
-
-export const updateToolStatusByDate = async (req: Request, res: Response) => {};
