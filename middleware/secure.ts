@@ -3,10 +3,11 @@ import { Request, Response, NextFunction } from 'express';
 
 // User data interface reflecting the User model in Prisma
 interface UserData {
-    id: number; // Match with the User model's id
+    id: number;
     username: string;
-    email: string; // Email field from the User model
-    isAdmin?: boolean; // Optional field for admin status
+    email: string;
+    role: 'user' | 'admin' | 'superAdmin'; // Match the Role enum
+    location?: string; // Optional location field
 }
 
 // Function to generate a JWT token for a user
@@ -15,53 +16,65 @@ export const generateToken = (user: UserData) => {
         id: user.id, 
         username: user.username, 
         email: user.email,
-        isAdmin: user.isAdmin || false, // Default to false if not provided
+        role: user.role,
+        location: user.location || null, // Default to null if not provided
     };
+
     return jwt.sign(payload, "tullir@@@", {
-        expiresIn: '7d'
+        expiresIn: '7d', // Token expires in 7 days
     });
-}
+};
 
 // Interface to extend Express Request for custom user data
 export interface CustomUserRequest extends Request {
-    user?: UserData; // Optional user property
+    user?: UserData; // Optional user property to store decoded token
 }
 
 // Middleware to decode JWT token and attach user data to the request
 export const decodeToken = (req: CustomUserRequest, res: Response, next: NextFunction) => {
     try {
-        const token = req.headers.authorization?.startsWith('Bearer ') ? 
-            req.headers.authorization.split(' ')[1] : null;
+        const token = req.headers.authorization?.startsWith('Bearer ') 
+            ? req.headers.authorization.split(' ')[1] 
+            : null;
 
         if (!token) {
             return res.status(401).json({
                 isSuccess: false,
-                message: 'Unauthorized'.toUpperCase(),
+                message: 'UNAUTHORIZED',
             });
         }
 
         // Verify the token and cast to UserData type
         const decoded = jwt.verify(token, "tullir@@@") as UserData; 
-        req.user = { ...decoded }; // Attach decoded user data to request
+        req.user = decoded; // Attach decoded user data to the request
         next();
     } catch (error) {
-        console.error(error);
+        console.error(`Error decoding token: ${error}`);
         return res.status(401).json({
             isSuccess: false,
-            message: 'Unauthorized'.toUpperCase(),
+            message: 'UNAUTHORIZED',
         });
     }
-}
+};
 
+// Middleware to check if the user has admin or superAdmin role
+export const isAdmin = (req: CustomUserRequest, res: Response, next: NextFunction) => {
+    if (!req.user || (req.user.role !== 'admin' && req.user.role !== 'superAdmin')) {
+        return res.status(403).json({
+            isSuccess: false,
+            message: 'FORBIDDEN: You do not have sufficient permissions.',
+        });
+    }
+    next();
+};
 
-
-
- // Ensure this matches your project structure
-
-// export const isSuperAdmin = (req: CustomUserRequest, res: Response, next: NextFunction): void => {
-//     if (!req.user || !req.user.isAdmin) {
-//         res.status(403).json({ message: 'Forbidden: You do not have sufficient permissions.' });
-//         return;
-//     }
-//     next();
-// };
+// Middleware to check if the user has superAdmin role
+export const isSuperAdmin = (req: CustomUserRequest, res: Response, next: NextFunction) => {
+    if (!req.user || req.user.role !== 'superAdmin') {
+        return res.status(403).json({
+            isSuccess: false,
+            message: 'FORBIDDEN: You do not have sufficient permissions.',
+        });
+    }
+    next();
+};

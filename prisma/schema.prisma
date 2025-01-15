@@ -139,6 +139,7 @@ model Employee {
 model Post {
   id              Int           @id @default(autoincrement())
   title           String
+  Image            String
   content         String
   status          VisibilityStatus @default(HIDDEN)
   organization_id Int
