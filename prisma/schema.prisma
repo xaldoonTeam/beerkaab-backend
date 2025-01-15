@@ -16,6 +16,7 @@ datasource db {
 enum ToolStatus {
   AVAILABLE
   UNAVAILABLE
+  MAINTENANCE
 }
 
 enum ComStatus {
@@ -23,9 +24,9 @@ enum ComStatus {
   unpaid
 }
 
-enum recycle {
-  hidden
-  Nothidde
+enum VisibilityStatus {
+  VISIBLE
+  HIDDEN
 }
 
 // //google looging  
@@ -54,7 +55,7 @@ model User {
 
   type         type @default(User)
   role Role @default(user)
-
+  location String?
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -68,13 +69,15 @@ model Organizations {
   email       String    @unique
   address     String
   role Role @default(admin)
-  Isdeleted   recycle   @default(Nothidde)
+  Isdeleted   VisibilityStatus   @default(VISIBLE)
   status      ComStatus @default(unpaid)
   phone       String
   description String
   type        type      @default(Organization)
   tools       Tools[]
   orders      Orders[]
+  employes   Employee[]
+  posts    Post[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }
@@ -92,6 +95,8 @@ model Tools {
   status          ToolStatus    @default(AVAILABLE)
   location        String
   category        String
+  rating Float? @default(0.0)
+
   organization_id Int
   organization    Organizations @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   orders          Orders[]
@@ -111,6 +116,33 @@ model Orders {
   organization    Organizations @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   tool_id         Int
   tool            Tools         @relation(fields: [tool_id], references: [id])
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+
+
+
+model Employee {
+  id          Int      @id @default(autoincrement())
+  name        String
+  skillset    String
+  availability Boolean @default(true)
+  organization_id Int
+  organization Organizations @relation(fields: [organization_id], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+
+
+model Post {
+  id              Int           @id @default(autoincrement())
+  title           String
+  content         String
+  status          VisibilityStatus @default(VISIBLE)
+  organization_id Int
+  organization    Organizations @relation(fields: [organization_id], references: [id])
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 }
