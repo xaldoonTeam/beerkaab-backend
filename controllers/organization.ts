@@ -93,7 +93,7 @@ export const recycleOrganization = async (
     // Proceed to update if it exists
     const updatedOrganization = await prisma.organizations.update({
       where: { id: Number(id) },
-      data: { Isdeleted: 'hidden' },
+      data: { Isdeleted: 'HIDDEN' },
     });
 
     res.status(200).json({
@@ -116,7 +116,7 @@ export const restoreOrganization = async (
 
     // Check if organization exists and is marked as deleted
     const organization = await prisma.organizations.findUnique({
-      where: { id: Number(id), Isdeleted: 'hidden' },
+      where: { id: Number(id), Isdeleted: 'HIDDEN' },
     });
 
     if (!organization) {
@@ -129,7 +129,7 @@ export const restoreOrganization = async (
     // Proceed to restore if it exists
     const updatedOrganization = await prisma.organizations.update({
       where: { id: Number(id) },
-      data: { Isdeleted: 'Nothidde' },
+      data: { Isdeleted: 'VISIBLE' },
     });
 
     res.status(200).json({

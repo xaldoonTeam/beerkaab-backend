@@ -140,7 +140,7 @@ model Post {
   id              Int           @id @default(autoincrement())
   title           String
   content         String
-  status          VisibilityStatus @default(VISIBLE)
+  status          VisibilityStatus @default(HIDDEN)
   organization_id Int
   organization    Organizations @relation(fields: [organization_id], references: [id])
   createdAt       DateTime      @default(now())
