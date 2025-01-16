@@ -31,31 +31,33 @@ export interface CustomUserRequest extends Request {
 }
 
 // Middleware to decode JWT token and attach user data to the request
-export const decodeToken = (req: CustomUserRequest, res: Response, next: NextFunction) => {
+export const decodeToken = (req: CustomUserRequest, res: Response, next: NextFunction): void => {
     try {
         const token = req.headers.authorization?.startsWith('Bearer ') 
             ? req.headers.authorization.split(' ')[1] 
             : null;
 
         if (!token) {
-            return res.status(401).json({
+            res.status(401).json({
                 isSuccess: false,
                 message: 'UNAUTHORIZED',
             });
+            return; // Stop execution here if no token is provided
         }
 
         // Verify the token and cast to UserData type
         const decoded = jwt.verify(token, "tullir@@@") as UserData; 
         req.user = decoded; // Attach decoded user data to the request
-        next();
+        next(); // Pass control to the next middleware
     } catch (error) {
         console.error(`Error decoding token: ${error}`);
-        return res.status(401).json({
+        res.status(401).json({
             isSuccess: false,
             message: 'UNAUTHORIZED',
         });
     }
 };
+
 
 // Middleware to check if the user has admin or superAdmin role
 export const isAdmin = (req: CustomUserRequest, res: Response, next: NextFunction) => {

@@ -2,6 +2,7 @@ import prisma from '../config/dbConn.ts';
 import { NextFunction, Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'
+import { CustomUserRequest } from '../middleware/secure.ts';
 
 
 // User Creation
@@ -75,9 +76,77 @@ export const createUser = async (
 
 
 
-interface CustomUserRequest extends Request {
-  user?: string;
-}
+
+
+
+
+// Promote User to Admin or Demote Admin to User
+export const updateUserRole = async (req: CustomUserRequest, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params; // ID of the user to modify
+    const { role } = req.body; // Desired role ('user', 'admin', 'superAdmin')
+
+    // Ensure `user` is attached to the request and has sufficient permissions
+    if (!req.user) {
+      res.status(401).json({
+        isSuccess: false,
+        message: 'Unauthorized: You must be logged in.',
+      });
+      return;
+    }
+
+    // Check if the target user exists
+    const targetUser = await prisma.user.findUnique({ where: { id: Number(id) } });
+    if (!targetUser) {
+      res.status(404).json({ message: 'User not found' });
+      return;
+    }
+
+    // Validation: Ensure `role` is valid
+    if (!['user', 'admin', 'superAdmin'].includes(role)) {
+      res.status(400).json({ message: 'Invalid role. Allowed roles: user, admin, superAdmin.' });
+      return;
+    }
+
+    // SuperAdmin-specific logic
+    if (role === 'superAdmin') {
+      if (req.user.role !== 'superAdmin') {
+        res.status(403).json({
+          isSuccess: false,
+          message: 'FORBIDDEN: Only superAdmins can assign or remove superAdmin privileges.',
+        });
+        return;
+      }
+    }
+
+    // Admin-specific logic
+    if (role === 'admin' && req.user.role !== 'admin' && req.user.role !== 'superAdmin') {
+      res.status(403).json({
+        isSuccess: false,
+        message: 'FORBIDDEN: Only admins or superAdmins can assign admin privileges.',
+      });
+      return;
+    }
+
+    // Update the user's role
+    const updatedUser = await prisma.user.update({
+      where: { id: Number(id) },
+      data: { role },
+    });
+
+    res.status(200).json({
+      isSuccess: true,
+      message: `User role updated successfully to ${role}.`,
+      updatedUser,
+    });
+  } catch (err) {
+    console.error(`Error while updating user role: ${err}`);
+    res.status(500).json({
+      isSuccess: false,
+      message: 'Internal server error',
+    });
+  }
+};
 
 
 
