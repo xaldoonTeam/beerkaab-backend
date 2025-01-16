@@ -9,7 +9,8 @@ import {
   restorePost,
   acceptPost,
 } from '../controllers/Post';
-import { decodeToken } from '../middleware/security/jwt.ts';
+import { decodeToken } from '../middleware/secure';
+
 
 const router = express.Router();
 

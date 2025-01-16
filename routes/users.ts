@@ -15,9 +15,9 @@ const router = express.Router();
 
 router.post('/create', createUser);
 router.put('/login', login);
-router.put('/:id', updateUser);
-router.get("/All", getAllUsers)
-router.delete('/:id', deleteUser);
+router.put('/:id',decodeToken, updateUser);
+router.get("/All",decodeToken, getAllUsers)
+router.delete('/:id',decodeToken, deleteUser);
 router.put('/update-role/:id',decodeToken, updateUserRole);
 
 

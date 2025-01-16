@@ -37,6 +37,20 @@ export const getAllPosts = async (_: Request, res: Response): Promise<void> => {
   }
 };
 
+
+// Get All Recycle Posts
+export const getAllRecyclePosts = async (_: Request, res: Response): Promise<void> => {
+  try {
+    const posts = await prisma.post.findMany(
+      {where:{status:"HIDDEN"}}
+    );
+    res.status(200).json(posts);
+  } catch (err) {
+    console.error(`Error while fetching posts: ${err}`);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
 // Get One Post
 export const getOnePost = async (req: Request, res: Response): Promise<void> => {
   try {

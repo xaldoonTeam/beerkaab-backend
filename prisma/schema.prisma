@@ -125,6 +125,7 @@ model Orders {
 
 model Employee {
   id          Int      @id @default(autoincrement())
+  Image       String
   name        String
   skillset    String
   availability Boolean @default(true)
