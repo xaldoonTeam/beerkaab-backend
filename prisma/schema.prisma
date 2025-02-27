@@ -48,18 +48,37 @@ enum Role {
   superAdmin
 }
 
+
+///  farmer(user)  and  company owners( admin and superAdmin)
 model User {
   id        Int      @id @default(autoincrement())
   username  String
   email     String   @unique
 
-  type         type @default(User)
+  // type         type @default(User)
   role Role @default(user)
   location String?
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+
+
+// compnay user     usr  admin  and superAdmin 
+  model company_users {
+  user_id                   Int                         @id @default(autoincrement())
+  full_name                 String                      @db.VarChar
+  email                     String                      @unique @db.VarChar(255)
+  password                  String                      @db.VarChar(64)
+  role                      Role
+  orgId                        Int?                    
+  create_at                 DateTime?                   @default(dbgenerated("CURRENT_DATE")) @db.Date
+  updated_at                DateTime?                   @default(dbgenerated("CURRENT_DATE")) @db.Date
+  // comp_users_refresh_tokens comp_users_refresh_tokens[]
+  Organizations                 Organizations?                  @relation(fields: [orgId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
 
 model Organizations {
   id          Int       @id @default(autoincrement())
@@ -75,6 +94,7 @@ model Organizations {
   description String
   type        type      @default(Organization)
   tools       Tools[]
+  company_users company_users[]
   orders      Orders[]
   employes   Employee[]
   posts    Post[]
