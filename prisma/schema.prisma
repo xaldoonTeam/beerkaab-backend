@@ -37,10 +37,13 @@ enum VisibilityStatus {
 //   image String?
 // }
 // user needed
-enum type {
-  User
-  Organization
-}
+
+
+
+// enum type {
+//   User
+//   Organization
+// }
 
 enum Role {
   user
@@ -54,8 +57,6 @@ model User {
   id        Int      @id @default(autoincrement())
   username  String
   email     String   @unique
-
-  // type         type @default(User)
   role Role @default(user)
   location String?
   password  String
@@ -75,24 +76,30 @@ model User {
   orgId                        Int?                    
   create_at                 DateTime?                   @default(dbgenerated("CURRENT_DATE")) @db.Date
   updated_at                DateTime?                   @default(dbgenerated("CURRENT_DATE")) @db.Date
-  // comp_users_refresh_tokens comp_users_refresh_tokens[]
   Organizations                 Organizations?                  @relation(fields: [orgId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
+
+
+
+//Organization removed item
+// { 
+//    // username    String    // no more needed
+//   // password    String    // no more needed
+// role Role @default(admin)  no more needed
+// type        type      @default(Organization) 
+// }
 
 
 model Organizations {
   id          Int       @id @default(autoincrement())
   name        String
-  username    String
-  password    String
   email       String    @unique
   address     String
-  role Role @default(admin)
   Isdeleted   VisibilityStatus   @default(VISIBLE)
   status      ComStatus @default(unpaid)
   phone       String
-  description String
-  type        type      @default(Organization)
+  description String?
+  subscribtion_fee Decimal? 
   tools       Tools[]
   company_users company_users[]
   orders      Orders[]
